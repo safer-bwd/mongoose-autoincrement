@@ -47,7 +47,7 @@ it('should auto increment field', async () => {
   expect(order3.number).toBe(3);
 });
 
-it('should change counter if field has changed #1 (save)', async () => {
+it('should shift counter if field has changed #1 (save)', async () => {
   const schema = new mongoose.Schema({
     number: {
       type: Number,
@@ -58,6 +58,8 @@ it('should change counter if field has changed #1 (save)', async () => {
   const Order = mongoose.model('Order', schema);
 
   const order1 = new Order();
+  await order1.save();
+
   order1.number = 10;
   await order1.save();
   const foundOrder = await Order.findOne();
@@ -68,7 +70,7 @@ it('should change counter if field has changed #1 (save)', async () => {
   expect(order2.number).toBe(11);
 });
 
-it('should change counter if field has changed #2 (findOneAndUpdate)', async () => {
+it('should shift counter if field has changed #2 (findOneAndUpdate)', async () => {
   const schema = new mongoose.Schema({
     number: {
       type: Number,
@@ -98,7 +100,7 @@ it('should change counter if field has changed #2 (findOneAndUpdate)', async () 
   expect(order3.number).toBe(21);
 });
 
-it('should change counter if field has changed #3 (updateOne)', async () => {
+it('should shift counter if field has changed #3 (updateOne)', async () => {
   const schema = new mongoose.Schema({
     number: {
       type: Number,
@@ -128,7 +130,7 @@ it('should change counter if field has changed #3 (updateOne)', async () => {
   expect(order3.number).toBe(21);
 });
 
-it('should change counter if field has changed #4 (update)', async () => {
+it('should shift counter if field has changed #4 (update)', async () => {
   const schema = new mongoose.Schema({
     number: {
       type: Number,
@@ -158,7 +160,7 @@ it('should change counter if field has changed #4 (update)', async () => {
   expect(order3.number).toBe(21);
 });
 
-it('should change counter if field has changed #5 (updateMany)', async () => {
+it('should shift counter if field has changed #5 (updateMany)', async () => {
   const schema = new mongoose.Schema({
     number: {
       type: Number,

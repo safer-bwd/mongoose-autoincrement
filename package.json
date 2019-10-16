@@ -29,7 +29,10 @@
   "peerDependencies": {
     "mongoose": "^5.x"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2"
+  },
   "devDependencies": {
     "@babel/cli": "^7.6.2",
     "@babel/core": "^7.6.2",
