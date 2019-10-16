@@ -64,7 +64,7 @@ it('should change counter if field has changed #1 (save)', async () => {
   expect(foundOrder.number).toBe(10);
 
   const order2 = new Order();
-  await order2.save()
+  await order2.save();
   expect(order2.number).toBe(11);
 });
 
@@ -81,19 +81,109 @@ it('should change counter if field has changed #2 (findOneAndUpdate)', async () 
   const order1 = new Order();
   await order1.save();
 
-  await Order.findOneAndUpdate({}, {
+  await Order.findOneAndUpdate({ number: 1 }, {
     number: 10
   });
 
   const order2 = new Order();
-  await order2.save()
+  await order2.save();
   expect(order2.number).toBe(11);
 
-  await Order.findOneAndUpdate({}, {
+  await Order.findOneAndUpdate({ number: 10 }, {
     $set: { number: 20 }
   });
 
   const order3 = new Order();
-  await order3.save()
+  await order3.save();
+  expect(order3.number).toBe(21);
+});
+
+it('should change counter if field has changed #3 (updateOne)', async () => {
+  const schema = new mongoose.Schema({
+    number: {
+      type: Number,
+      autoincrement: true
+    }
+  });
+  schema.plugin(autoIncrementPlugin);
+  const Order = mongoose.model('Order', schema);
+
+  const order1 = new Order();
+  await order1.save();
+
+  await Order.updateOne({ number: 1 }, {
+    number: 10
+  });
+
+  const order2 = new Order();
+  await order2.save();
+  expect(order2.number).toBe(11);
+
+  await Order.updateOne({ number: 10 }, {
+    $set: { number: 20 }
+  });
+
+  const order3 = new Order();
+  await order3.save();
+  expect(order3.number).toBe(21);
+});
+
+it('should change counter if field has changed #4 (update)', async () => {
+  const schema = new mongoose.Schema({
+    number: {
+      type: Number,
+      autoincrement: true
+    }
+  });
+  schema.plugin(autoIncrementPlugin);
+  const Order = mongoose.model('Order', schema);
+
+  const order1 = new Order();
+  await order1.save();
+
+  await Order.update({ number: 1 }, {
+    number: 10
+  });
+
+  const order2 = new Order();
+  await order2.save();
+  expect(order2.number).toBe(11);
+
+  await Order.update({ number: 10 }, {
+    $set: { number: 20 }
+  });
+
+  const order3 = new Order();
+  await order3.save();
+  expect(order3.number).toBe(21);
+});
+
+it('should change counter if field has changed #5 (updateMany)', async () => {
+  const schema = new mongoose.Schema({
+    number: {
+      type: Number,
+      autoincrement: true
+    }
+  });
+  schema.plugin(autoIncrementPlugin);
+  const Order = mongoose.model('Order', schema);
+
+  const order1 = new Order();
+  await order1.save();
+
+  await Order.updateMany({ number: 1 }, {
+    number: 10
+  });
+
+  const order2 = new Order();
+  await order2.save();
+  expect(order2.number).toBe(11);
+
+  await Order.updateMany({ number: 10 }, {
+    $set: { number: 20 }
+  });
+
+  const order3 = new Order();
+  await order3.save();
   expect(order3.number).toBe(21);
 });
