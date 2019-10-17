@@ -30,6 +30,7 @@ export default (schema, options) => {
   async function preSave(next) {
     const doc = this;
     const { modelName } = doc.constructor;
+
     const promises = fields.map(async (field) => {
       const { path } = field;
       const curValue = Number(get(doc, path));
