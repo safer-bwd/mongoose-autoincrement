@@ -37,7 +37,7 @@ export default (schema, options) => {
         const newValue = await Counter.getNext(modelName, path);
         set(doc, path, newValue);
       } else if (doc.isModified(path) && Number.isInteger(curValue)) {
-        await Counter.shiftCurrent(modelName, path, Number(curValue));
+        await Counter.shiftCurrent(modelName, path, curValue);
       }
     });
 
@@ -59,8 +59,8 @@ export default (schema, options) => {
     const promises = mutableFields.map(async (field) => {
       const { path } = field;
       const changedValue = Number(query.get(path));
-      if (Number.isInteger(Number(changedValue))) {
-        await Counter.shiftCurrent(modelName, path, Number(changedValue));
+      if (Number.isInteger(changedValue)) {
+        await Counter.shiftCurrent(modelName, path, changedValue);
       }
     });
 
