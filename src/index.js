@@ -2,9 +2,7 @@ import set from 'lodash.set';
 import get from 'lodash.get';
 import makeCounter from './counter/make';
 
-let Counter;
-
-const getAutoIncrementFields = (schema) => {
+const getAutoincrementFields = (schema) => {
   const fields = [];
 
   schema.eachPath((path, schematype) => {
@@ -20,29 +18,58 @@ const getAutoIncrementFields = (schema) => {
 };
 
 export default (schema, options) => {
-  const { counterName = '__Counter' } = options || {};
-  Counter = makeCounter(counterName);
+  const fields = getAutoincrementFields(schema);
+  if (fields.length === 0) {
+    return;
+  }
 
-  const fields = getAutoIncrementFields(schema);
+  const { counterName = '__Autoincrement_Counter' } = options || {};
+  const Counter = makeCounter(counterName);
+  schema.static('getCounterModel', () => Counter);
 
-  schema.pre('save', async function (next) {
+  async function preSave(next) {
     const doc = this;
     const { modelName } = doc.constructor;
-
     const promises = fields.map(async (field) => {
       const { path } = field;
-      let value = get(doc, path);
-      if (doc.isNew && !value) {
-        value = await Counter.getNext(modelName, path);
-        set(doc, path, value);
-      } else {
-        if (Number.isInteger(Number(value))) {
-          await Counter.shiftCurrent(modelName, path, Number(value));
-        }
+      const curValue = Number(get(doc, path));
+      if (doc.isNew && !curValue) {
+        const newValue = await Counter.getNext(modelName, path);
+        set(doc, path, newValue);
+      } else if (doc.isModified(path) && Number.isInteger(curValue)) {
+        await Counter.shiftCurrent(modelName, path, Number(curValue));
       }
     });
-    await Promise.all(promises);
 
+    await Promise.all(promises);
     next();
-  });
+  }
+
+  schema.pre('save', preSave);
+
+  const mutableFields = fields.filter(field => !field.options.immutable);
+  if (mutableFields.length === 0) {
+    return;
+  }
+
+  async function preUpdate(next) {
+    const query = this;
+    const { modelName } = query.model;
+
+    const promises = mutableFields.map(async (field) => {
+      const { path } = field;
+      const changedValue = Number(query.get(path));
+      if (Number.isInteger(Number(changedValue))) {
+        await Counter.shiftCurrent(modelName, path, Number(changedValue));
+      }
+    });
+
+    await Promise.all(promises);
+    next();
+  }
+
+  schema.pre('findOneAndUpdate', preUpdate);
+  schema.pre('updateOne', preUpdate);
+  schema.pre('updateMany', preUpdate);
+  schema.pre('update', preUpdate); // deprecated
 };

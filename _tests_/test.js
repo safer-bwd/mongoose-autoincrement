@@ -176,36 +176,6 @@ it('should shift counter if field changed by updateOne()', async () => {
   expect(order3.code).toBe(21);
 });
 
-it('should shift counter if field changed by update()', async () => {
-  const schema = new mongoose.Schema({
-    code: {
-      type: Number,
-      autoincrement: true
-    }
-  });
-  schema.plugin(autoIncrementPlugin);
-  const Order = mongoose.model('Order', schema);
-
-  const order1 = new Order();
-  await order1.save();
-
-  await Order.update({ code: 1 }, {
-    code: 10
-  });
-
-  const order2 = new Order();
-  await order2.save();
-  expect(order2.code).toBe(11);
-
-  await Order.update({ code: 10 }, {
-    $set: { code: 20 }
-  });
-
-  const order3 = new Order();
-  await order3.save();
-  expect(order3.code).toBe(21);
-});
-
 it('should shift counter if field changed by updateMany()', async () => {
   const schema = new mongoose.Schema({
     code: {
@@ -228,6 +198,36 @@ it('should shift counter if field changed by updateMany()', async () => {
   expect(order2.code).toBe(11);
 
   await Order.updateMany({ code: 10 }, {
+    $set: { code: 20 }
+  });
+
+  const order3 = new Order();
+  await order3.save();
+  expect(order3.code).toBe(21);
+});
+
+it('should shift counter if field changed by update()', async () => {
+  const schema = new mongoose.Schema({
+    code: {
+      type: Number,
+      autoincrement: true
+    }
+  });
+  schema.plugin(autoIncrementPlugin);
+  const Order = mongoose.model('Order', schema);
+
+  const order1 = new Order();
+  await order1.save();
+
+  await Order.update({ code: 1 }, {
+    code: 10
+  });
+
+  const order2 = new Order();
+  await order2.save();
+  expect(order2.code).toBe(11);
+
+  await Order.update({ code: 10 }, {
     $set: { code: 20 }
   });
 
